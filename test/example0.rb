@@ -1,0 +1,5 @@
+
+$: << 'lib'
+
+require 'botaku'
+
