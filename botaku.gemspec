@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.summary = 'a Slack bot abstraction'
 
   s.description = %{
-A Slack bot abstraction, built on top of the slack-ruby-client gem.
+A Slack bot abstraction, built on top of faye-websocket.
   }.strip
 
   #s.files = `git ls-files`.split("\n")
@@ -28,7 +28,8 @@ A Slack bot abstraction, built on top of the slack-ruby-client gem.
     "#{s.name}.gemspec",
   ]
 
-  s.add_runtime_dependency 'slack-ruby-client', '~> 0.8'
+  s.add_runtime_dependency 'faye-websocket', '~> 0.10'
+  s.add_runtime_dependency 'httpclient', '~> 2.8'
 
   #s.add_development_dependency 'rspec', '>= 2.13.0'
 
