@@ -1,9 +1,5 @@
 
-#r = Botaku::Client
-#  .new(token: File.read('.slack_api_token').strip)
-#  .rtm.start
-#  #.api.test
-#pp r['url']
+require 'pp'
 
 $: << 'lib'
 require 'botaku'
@@ -12,7 +8,7 @@ c = Botaku::Client.new(token: File.read('test/.slack_api_token').strip)
 
 c.on('hello') do
   p [ :hello ]
-  #c.say('born to be alive...', '#test')
+  c.say('born to be alive...', '#test')
 end
 c.on('message') do |data|
   p [ :message, data ]

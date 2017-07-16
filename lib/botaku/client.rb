@@ -46,14 +46,14 @@ module Botaku
       end
     end
 
-    def say(text_or_args, args={})
+    # say('hello')
+    # say('hello', '#test_channel')
+    # say('hello', channel: 'C12345ABC')
+    # say('hello', channel: '#test_channel')
+    #
+    def say(*as)
 
-      if text_or_args.is_a?(Hash)
-        args = text_or_args.merge(args)
-      else
-        args[:text] = text_or_args.to_s
-      end
-
+      args = rework_args(as)
       args[:as_user] = true unless args.has_key?(:as_user)
 
       chat.postMessage(args)
@@ -108,6 +108,51 @@ module Botaku
         block.arity == 1 ? block.call(data) : block.call
       end
     end
+
+    def rework_args(as)
+
+      args = {}
+      as.each do |a|
+        case a
+        when Hash then args.merge!(a)
+        when /\A#[a-z_]+\z/ then args[:channel] = a
+        when String then args[:text] = a
+        end
+      end
+
+      c = args[:channel]
+      args[:channel] = channel_id(c)
+
+      args
+    end
+
+    def channel(c)
+
+      case c
+      when Hash then c
+      when /\A#/ then @rtm['channels'].find { |h| h['name'] == c[1..-1] }
+      when /\A[CG][0-9A-Z]+\z/ then @rtm['channels'].find { |h| h['id'] == c }
+      else @rtm.find { |h| h['name'] == c }
+      end
+    end
+
+    def channel_id(c)
+
+      c = channel(c); c ? c['id'] : nil
+    end
+
+#    def object(id)
+#
+#      cat =
+#        case id
+#        when /\A[CG][0-9A-Z]+\z/ then 'channels'
+#        when /\A[T][0-9A-Z]/ then 'teams'
+#        when /\A[U][0-9A-Z]/ then 'users'
+#        else nil
+#        end
+#
+#      cat ? @rtm[cat].find { |h| h['id'] == id } : nil
+#    end
   end
 end
 
