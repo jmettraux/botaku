@@ -18,7 +18,9 @@ module Botaku
 
     attr_reader :client, :opts
 
-    def initialize(opts={})
+    def initialize(opts)
+
+      fail ArgumentError.new('missing :token') unless opts[:token]
 
       @opts = opts
 
@@ -47,7 +49,7 @@ module Botaku
 
     def start!
 
-      @client = Slack::RealTime::Client.new
+      @client = Slack::RealTime::Client.new(token: @opts[:token])
 
       @client.on(:hello) { invoke(:hello) }
       @client.on(:close) { |d| invoke(:close, d) }
@@ -59,6 +61,7 @@ module Botaku
 
       @client.start!
     end
+    alias join start!
 
     private
 
@@ -97,10 +100,12 @@ module Botaku
 
       c = c || @channel
 
+      c = c[1..-1] if c.is_a?(String) && c[0, 1] == '#'
+
       channel =
         (c.is_a?(Hash) && c) ||
         @client.channels[c] ||
-        @client.channels.find { |k, v| v['name'] == c } ||
+        @client.channels.values.find { |v| v['name'] == c } ||
         { 'id' => c }
 
       channel['id']
@@ -110,6 +115,17 @@ module Botaku
 
       m = data.text.match(/\A\s*#{command}(?:\s+(.+))?\z/i)
       m ? (m[1] || '').split : nil
+    end
+
+    def user(data)
+
+      @client.users[data['user']]
+    end
+
+    def user_name(data)
+
+      u = user(data)
+      u ? u['name'] : nil
     end
   end
 end
