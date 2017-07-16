@@ -22,6 +22,11 @@ module Botaku
       @handlers = {}
     end
 
+    def sself
+
+      @rtm['self']
+    end
+
     %w[ api chat rtm ].each do |mod|
 
       define_method mod do
@@ -45,6 +50,7 @@ module Botaku
         ws.on(:message) { |event| dispatch_message(event) }
       end
     end
+    alias join run
 
     # say('hello')
     # say('hello', '#test_channel')
@@ -57,6 +63,13 @@ module Botaku
       args[:as_user] = true unless args.has_key?(:as_user)
 
       chat.postMessage(args)
+    end
+
+    def objects
+
+      @objects ||=
+        (@rtm['channels'] + @rtm['groups'] + @rtm['users'])
+          .inject({}) { |h, o| h[o['id']] = o; h }
     end
 
     private
@@ -140,19 +153,6 @@ module Botaku
 
       c = channel(c); c ? c['id'] : nil
     end
-
-#    def object(id)
-#
-#      cat =
-#        case id
-#        when /\A[CG][0-9A-Z]+\z/ then 'channels'
-#        when /\A[T][0-9A-Z]/ then 'teams'
-#        when /\A[U][0-9A-Z]/ then 'users'
-#        else nil
-#        end
-#
-#      cat ? @rtm[cat].find { |h| h['id'] == id } : nil
-#    end
   end
 end
 

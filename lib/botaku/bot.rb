@@ -14,41 +14,40 @@ module Botaku
       start! if opts[:start]
     end
 
+    def sself
+
+      @client.sself
+    end
+
     def name
 
-      @client.users[@client.self.id].name
+      @client.objects[sself['id']]['name']
     end
 
-    def say(text, channel=nil)
+    def say(*as)
 
-      @client.message(text: text, channel: determine_channel(channel))
+      @client.say(*as)
     end
 
-    def typing(channel=nil)
+    def typing(channel=@channel)
 
-      @client.typing(channel: determine_channel(channel))
+      @client.typing(channel: channel)
     end
 
-    def ping
+    def run
 
-      @client.ping
-    end
+      @client = Botaku::Client.new(token: @opts[:token])
 
-    def start!
-
-      @client = Slack::RealTime::Client.new(token: @opts[:token])
-
-      @client.on(:hello) { invoke(:hello) }
+      @client.on('hello') { invoke(:hello) }
       @client.on(:close) { |d| invoke(:close, d) }
-      @client.on(:closed) { |d| invoke(:closed, d) }
 
-      @client.on(:message) do |d|
-        (invoke_command(d) || invoke(:message, d)) if d.user != @client.self.id
+      @client.on('message') do |d|
+        (invoke_command(d) || invoke(:message, d)) if d['user'] != sself['id']
       end
 
-      @client.start!
+      @client.run
     end
-    alias join start!
+    alias join run
 
     private
 
@@ -83,21 +82,6 @@ module Botaku
       false
     end
 
-    def determine_channel(c)
-
-      c = c || @channel
-
-      c = c[1..-1] if c.is_a?(String) && c[0, 1] == '#'
-
-      channel =
-        (c.is_a?(Hash) && c) ||
-        @client.channels[c] ||
-        @client.channels.values.find { |v| v['name'] == c } ||
-        { 'id' => c }
-
-      channel['id']
-    end
-
     def match_command(data, command)
 
       m = data.text.match(/\A\s*#{command}(?:\s+(.+))?\z/i)
@@ -106,7 +90,7 @@ module Botaku
 
     def user(data)
 
-      @client.users[data['user']]
+      @client.objects[data['user']]
     end
 
     def user_name(data)

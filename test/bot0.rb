@@ -1,13 +1,15 @@
 
-$: << 'lib'
+require 'pp'
 
+$: << 'lib'
 require 'botaku'
+
 
 class ZeroBot < Botaku::Bot
 
   def on_hello
 
-    p [ :on_hello, @client.self.id ]
+    p [ :on_hello, sself['id'] ]
 
     say('ZeroBot alive', '#test')
   end
@@ -21,9 +23,9 @@ class ZeroBot < Botaku::Bot
 
   def on_message(data)
 
-    p [ :on_message, user_name(data), data.text ]
+    p [ :on_message, user_name(data), data['text'] ]
   end
 end
 
-ZeroBot.new(token: File.read('test/.slack_api_token').strip).join
+ZeroBot.new(token: File.read('test/.slack_api_token').strip).run
 
