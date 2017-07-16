@@ -9,8 +9,15 @@ class ZeroBot < Botaku::Bot
 
     p [ :on_hello, @client.self.id ]
 
-    say("ZeroBot alive", '#test')
+    say('ZeroBot alive', '#test')
   end
+
+#  def on_close
+#
+#    p [ :on_close ]
+#
+#    say('ZeroBot says bye!', '#test')
+#  end
 
   def on_message(data)
 
