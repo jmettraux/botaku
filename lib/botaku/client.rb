@@ -22,7 +22,7 @@ module Botaku
       @handlers = {}
     end
 
-    %w[ api rtm ].each do |mod|
+    %w[ api chat rtm ].each do |mod|
 
       define_method mod do
         @modules[mod] ||= SlackModule.new(self, mod)
@@ -44,6 +44,19 @@ module Botaku
         end
         ws.on(:message) { |event| dispatch_message(event) }
       end
+    end
+
+    def say(text_or_args, args={})
+
+      if text_or_args.is_a?(Hash)
+        args = text_or_args.merge(args)
+      else
+        args[:text] = text_or_args.to_s
+      end
+
+      args[:as_user] = true unless args.has_key?(:as_user)
+
+      chat.postMessage(args)
     end
 
     private
@@ -75,7 +88,9 @@ module Botaku
 
     def escape(arg_value)
 
-      URI.escape(arg_value)
+      v = arg_value.is_a?(String) ? arg_value : arg_value.inspect
+
+      URI.escape(v)
     end
 
     def dispatch(event_type, event)
