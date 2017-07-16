@@ -1,18 +1,5 @@
 
-require 'slack-ruby-client'
-
-#Slack.configure do |config|
-#
-#  config.token = File.read(Botaku.etc.slack.token).strip
-#
-#  config.logger = Logger.new($stdout)
-#  config.logger.level = Logger::INFO
-#end
-
-
 module Botaku
-
-  VERSION = '0.9.0'
 
   class Bot
 

@@ -17,10 +17,36 @@ module Botaku
 
       @base_uri = 'https://slack.com/api'
       @modules = {}
-
       @http_client = HTTPClient.new
       @rtm = nil
+      @handlers = {}
     end
+
+    %w[ api rtm ].each do |mod|
+
+      define_method mod do
+        @modules[mod] ||= SlackModule.new(self, mod)
+      end
+    end
+
+    def on(type, &block)
+
+      (@handlers[type] ||= []) << block
+    end
+
+    def run
+
+      EM.run do
+        @rtm = rtm.start
+        ws = Faye::WebSocket::Client.new(@rtm['url'])
+        [ :open, :error, :close ].each do |event_type|
+          ws.on(event_type) { |event| dispatch(event_type, event) }
+        end
+        ws.on(:message) { |event| dispatch_message(event) }
+      end
+    end
+
+    private
 
     def get(mod, meth, args)
 
@@ -41,54 +67,32 @@ module Botaku
       def method_missing(meth, *args)
         args = [ {} ] if args.empty?
         return super if args.size != 1 || ! args[0].is_a?(Hash)
-        r = @client.get(@name, meth, args.first)
+        r = @client.send(:get, @name, meth, args.first)
         JSON.parse(r.body)
       end
       undef :test
     end
 
-    %w[ api rtm ].each do |mod|
-
-      define_method mod do
-        @modules[mod] ||= SlackModule.new(self, mod)
-      end
-    end
-
-    def run
-
-      EM.run do
-        @rtm = rtm.start
-        ws = Faye::WebSocket::Client.new(@rtm['url'])
-        ws.on(:open) { |event| p [ :open, event ] }
-        ws.on(:message) { |event| p [ :message, event.data ] }
-        ws.on(:close) { |event| p [ :close, event ] }
-        ws.on(:error) { |event| p [ :error, event ] }
-        p ws.version
-        p ws.protocol
-      end
-    end
-
-#    def join
-#
-#      @em_thread.join
-#    end
-
-    private
-
     def escape(arg_value)
 
       URI.escape(arg_value)
     end
+
+    def dispatch(event_type, event)
+
+      (@handlers[event_type] || []).each do |block|
+        block.arity == 1 ? block.call(event) : block.call
+      end
+    end
+
+    def dispatch_message(event)
+
+      data = JSON.parse(event.data)
+
+      (@handlers[data['type']] || []).each do |block|
+        block.arity == 1 ? block.call(data) : block.call
+      end
+    end
   end
 end
-
-#r = Botaku::Client
-#  .new(token: File.read('.slack_api_token').strip)
-#  .rtm.start
-#  #.api.test
-#pp r['url']
-
-r = Botaku::Client
-  .new(token: File.read('.slack_api_token').strip)
-  .run
 
