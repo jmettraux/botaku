@@ -109,10 +109,7 @@ module Botaku
 
     def typing(args)
 
-      do_send({
-        type: 'typing',
-        id: next_id,
-        channel: channel_id(args[:channel]) })
+      do_send(type: 'typing', id: next_id, channel: channel_id(args[:channel]))
     end
 
     private

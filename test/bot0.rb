@@ -12,6 +12,10 @@ class ZeroBot < Botaku::Bot
     p [ :on_hello, sself['id'] ]
 
     say('ZeroBot alive', '#test')
+
+    #client.on('user_typing') do |event|
+    #  p [ :user_typing, event ]
+    #end
   end
 
 #  def on_close
@@ -24,9 +28,8 @@ class ZeroBot < Botaku::Bot
   def on_message(data)
 
     typing('#test')
-    p [ :on_message, user_name(data), data['text'] ]
-    sleep 10
     say("@#{user_name(data)} said: #{data['text'].inspect}", '#test')
+    #p [ :on_message, user_name(data), data['text'] ]
   end
 end
 
