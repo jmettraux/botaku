@@ -18,6 +18,7 @@ module Botaku
       @base_uri = 'https://slack.com/api'
       @modules = {}
       @http_client = HTTPClient.new
+      @ws_client = nil
       @rtm = nil
       @handlers = {}
     end
@@ -30,7 +31,7 @@ module Botaku
     %w[ api chat rtm ].each do |mod|
 
       define_method mod do
-        @modules[mod] ||= SlackModule.new(self, mod)
+        @modules[mod] ||= WebApiModule.new(self, mod)
       end
     end
 
@@ -43,11 +44,11 @@ module Botaku
 
       EM.run do
         @rtm = rtm.start
-        ws = Faye::WebSocket::Client.new(@rtm['url'])
+        @ws_client = Faye::WebSocket::Client.new(@rtm['url'])
         [ :open, :error, :close ].each do |event_type|
-          ws.on(event_type) { |event| dispatch(event_type, event) }
+          @ws_client.on(event_type) { |event| dispatch(event_type, event) }
         end
-        ws.on(:message) { |event| dispatch_message(event) }
+        @ws_client.on(:message) { |event| dispatch_message(event) }
       end
     end
     alias join run
@@ -65,11 +66,53 @@ module Botaku
       chat.postMessage(args)
     end
 
+    def channels; @rtm['channels']; end
+    def groups; @rtm['groups']; end
+    def users; @rtm['users']; end
+
     def objects
 
       @objects ||=
-        (@rtm['channels'] + @rtm['groups'] + @rtm['users'])
-          .inject({}) { |h, o| h[o['id']] = o; h }
+        (channels + groups + users).inject({}) { |h, o| h[o['id']] = o; h }
+    end
+
+    def obj(o, cat=nil)
+
+      if o.is_a?(Hash)
+        cat = cat ? cat.to_s : nil
+        o = o[cat]
+      end
+
+      case o
+      when /\AU[0-9A-Z]+\z/
+        users.find { |u| u['id'] == o }
+      when /\A@[^\s]+\z/
+        users.find { |u| u['name'] == o[1..-1] }
+      when /\A[CG][0-9A-Z]+\z/
+        (channels + groups).find { |c| c['id'] == o }
+      when /\A#[^\s]+\z/
+        (channels + groups).find { |c| c['name'] == o[1..-1] }
+      else
+        nil
+      end
+    end
+
+    def obj_id(o, cat=nil); h = obj(o, cat); h ? h['id'] : nil; end
+    def obj_name(o, cat=nil); h = obj(o, cat); h ? h['name'] : nil; end
+
+    def user(o); obj(o, :user); end
+    def user_id(o); obj_id(o, :user); end
+    def user_name(o); obj_name(o, :user); end
+    def channel(o); obj(o, :channel); end
+    def channel_id(o); obj_id(o, :channel); end
+    def channel_name(o); obj_name(o, :channel); end
+
+    def typing(args)
+
+      do_send({
+        type: 'typing',
+        id: next_id,
+        channel: channel_id(args[:channel]) })
     end
 
     private
@@ -85,7 +128,17 @@ module Botaku
       @http_client.get(uri)
     end
 
-    class SlackModule
+    def do_send(args)
+
+      @ws_client.send(JSON.dump(args))
+    end
+
+    def next_id
+
+      @id = (@id ||= -1) + 1
+    end
+
+    class WebApiModule
       def initialize(client, name)
         @client = client
         @name = name
@@ -137,21 +190,6 @@ module Botaku
       args[:channel] = channel_id(c)
 
       args
-    end
-
-    def channel(c)
-
-      case c
-      when Hash then c
-      when /\A#/ then @rtm['channels'].find { |h| h['name'] == c[1..-1] }
-      when /\A[CG][0-9A-Z]+\z/ then @rtm['channels'].find { |h| h['id'] == c }
-      else @rtm.find { |h| h['name'] == c }
-      end
-    end
-
-    def channel_id(c)
-
-      c = channel(c); c ? c['id'] : nil
     end
   end
 end

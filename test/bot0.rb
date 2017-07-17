@@ -23,7 +23,10 @@ class ZeroBot < Botaku::Bot
 
   def on_message(data)
 
+    typing('#test')
     p [ :on_message, user_name(data), data['text'] ]
+    sleep 10
+    say("@#{user_name(data)} said: #{data['text'].inspect}", '#test')
   end
 end
 

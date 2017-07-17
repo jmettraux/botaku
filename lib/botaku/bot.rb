@@ -88,15 +88,12 @@ module Botaku
       m ? (m[1] || '').split : nil
     end
 
-    def user(data)
-
-      @client.objects[data['user']]
-    end
-
-    def user_name(data)
-
-      u = user(data)
-      u ? u['name'] : nil
+    %w[
+      obj obj_id obj_name
+      user user_id user_name
+      channel channel_id channel_name
+    ].each do |m|
+      define_method(m) { |o| @client.send(m, o) }
     end
   end
 end
