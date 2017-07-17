@@ -93,7 +93,8 @@ module Botaku
       when /\A#[^\s]+\z/
         (channels + groups).find { |c| c['name'] == o[1..-1] }
       else
-        nil
+        objects[o] ||
+        objects.values.find { |x| x['name'] == o }
       end
     end
 
