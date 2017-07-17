@@ -21,6 +21,8 @@ module Botaku
       @ws_client = nil
       @rtm = nil
       @handlers = {}
+
+      @http_client.debug_dev = $stderr if ENV['BOTAKU_DEBUG_HTTP']
     end
 
     def sself
@@ -63,10 +65,17 @@ module Botaku
       args = rework_args(as)
       args[:as_user] = true unless args.has_key?(:as_user)
 
-      #args[:text] = args[:text]
-      #  .gsub(/&/, '&amp;').gsub(/</, '&lt;').gsub(/>/, '&gt;')
+      args[:text] = args[:text]
+        .gsub(/&/, '&amp;').gsub(/</, '&lt;').gsub(/>/, '&gt;')
 
-      chat.postMessage(args)
+      args[:mrkdwn] = true
+
+      #chat.postMessage(args)
+
+      args[:type] = 'message'
+      args[:id] = next_id
+
+      do_send(args)
     end
 
     def channels; @rtm['channels']; end
@@ -130,27 +139,10 @@ module Botaku
       @http_client.get(uri)
     end
 
-    def post(mod, meth, args)
-
-      uri = "#{@base_uri}/#{mod}.#{meth}"
-
-      args[:token] = @opts[:token]
-
-      @http_client.post(uri, args)
-    end
-
-    def request(mod, meth, args)
-
-      if meth.to_s.match(/\Apost/)
-        post(mod, meth, args)
-      else
-        get(mod, meth, args)
-      end
-    end
-
     def do_send(args)
 
-      @ws_client.send(JSON.dump(args))
+      @ws_client.send(JSON.dump(args) + "\n")
+        # the \n seems to help flushing the buffer
     end
 
     def next_id
@@ -166,7 +158,7 @@ module Botaku
       def method_missing(meth, *args)
         args = [ {} ] if args.empty?
         return super if args.size != 1 || ! args[0].is_a?(Hash)
-        r = @client.send(:request, @name, meth, args.first)
+        r = @client.send(:get, @name, meth, args.first)
         JSON.parse(r.body)
       end
       undef :test
