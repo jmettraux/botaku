@@ -10,8 +10,6 @@ module Botaku
       fail ArgumentError.new('missing :token') unless opts[:token]
 
       @opts = opts
-
-      start! if opts[:start]
     end
 
     def sself
@@ -36,7 +34,7 @@ module Botaku
 
     def run
 
-      @client = Botaku::Client.new(token: @opts[:token])
+      @client = Botaku::Client.new(@opts.dup)
 
       @client.on('hello') { invoke(:hello) }
       @client.on(:close) { |d| invoke(:close, d) }
