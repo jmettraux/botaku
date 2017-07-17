@@ -63,6 +63,9 @@ module Botaku
       args = rework_args(as)
       args[:as_user] = true unless args.has_key?(:as_user)
 
+      #args[:text] = args[:text]
+      #  .gsub(/&/, '&amp;').gsub(/</, '&lt;').gsub(/>/, '&gt;')
+
       chat.postMessage(args)
     end
 
@@ -117,13 +120,32 @@ module Botaku
 
     def get(mod, meth, args)
 
-      uri = "#{@base_uri}/#{mod}.#{meth}?token=#{@opts[:token]}"
-
-      args.each do |k, v|
-        uri = "#{uri}&#{k}=#{escape(v)}"
-      end
+      uri = args
+        .inject(
+          "#{@base_uri}/#{mod}.#{meth}?token=#{@opts[:token]}"
+        ) { |u, (k, v)|
+          u + "#{uri}&#{k}=#{escape(v)}"
+        }
 
       @http_client.get(uri)
+    end
+
+    def post(mod, meth, args)
+
+      uri = "#{@base_uri}/#{mod}.#{meth}"
+
+      args[:token] = @opts[:token]
+
+      @http_client.post(uri, args)
+    end
+
+    def request(mod, meth, args)
+
+      if meth.to_s.match(/\Apost/)
+        post(mod, meth, args)
+      else
+        get(mod, meth, args)
+      end
     end
 
     def do_send(args)
@@ -144,7 +166,7 @@ module Botaku
       def method_missing(meth, *args)
         args = [ {} ] if args.empty?
         return super if args.size != 1 || ! args[0].is_a?(Hash)
-        r = @client.send(:get, @name, meth, args.first)
+        r = @client.send(:request, @name, meth, args.first)
         JSON.parse(r.body)
       end
       undef :test
