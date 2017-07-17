@@ -24,7 +24,7 @@ module Botaku
 
     def say(*as)
 
-      @client.say(*as)
+      @client.say(*(as + [ @channel ]))
     end
 
     def typing(channel=@channel)

@@ -175,19 +175,16 @@ module Botaku
 
     def rework_args(as)
 
-      args = {}
-      as.each do |a|
-        case a
-        when Hash then args.merge!(a)
-        when /\A#[a-z_]+\z/ then args[:channel] = a
-        when String then args[:text] = a
+      as.inject({}) do |h, a|
+        if h[:channel] == nil && h[:channel] = channel_id(a)
+          # cid just got assigned
+        elsif a.is_a?(String)
+          h[:text] = a
+        elsif a.is_a?(Hash)
+          h.merge!(a)
         end
+        h
       end
-
-      c = args[:channel]
-      args[:channel] = channel_id(c)
-
-      args
     end
   end
 end
