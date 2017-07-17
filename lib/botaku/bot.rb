@@ -60,7 +60,7 @@ module Botaku
         .each do |meth|
           m = match_command(data, meth.to_s[11..-1])
           next unless m
-          data.match = m
+          data['match'] = m
           self.send(meth, data)
           return true
         end
@@ -82,7 +82,7 @@ module Botaku
 
     def match_command(data, command)
 
-      m = data.text.match(/\A\s*#{command}(?:\s+(.+))?\z/i)
+      m = data['text'].match(/\A\s*#{command}(?:\s+(.+))?\z/i)
       m ? (m[1] || '').split : nil
     end
 

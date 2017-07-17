@@ -178,7 +178,7 @@ module Botaku
       as.inject({}) do |h, a|
         if h[:channel] == nil && h[:channel] = channel_id(a)
           # cid just got assigned
-        elsif a.is_a?(String)
+        elsif h[:text] == nil && a.is_a?(String)
           h[:text] = a
         elsif a.is_a?(Hash)
           h.merge!(a)
