@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.summary = 'a Slack bot abstraction'
 
   s.description = %{
-A Slack bot abstraction, built on top of faye-websocket.
+A Slack bot abstraction, built on top of faye-websocket and httpclient.
   }.strip
 
   #s.files = `git ls-files`.split("\n")
