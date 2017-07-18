@@ -1,7 +1,7 @@
 
 # botaku
 
-A Slack bot abstraction, built on top of [faye-websocket](https://github.com/faye/faye-websocket-ruby).
+A Slack bot abstraction, built on top of [faye-websocket](https://github.com/faye/faye-websocket-ruby) and [httpclient](https://github.com/nahi/httpclient).
 
 
 ## use
