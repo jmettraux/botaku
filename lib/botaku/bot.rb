@@ -12,14 +12,14 @@ module Botaku
       @opts = opts
     end
 
-    def sself
+    def _self
 
-      @client.sself
+      @client._self
     end
 
     def name
 
-      @client.objects[sself['id']]['name']
+      @client.objects[_self['id']]['name']
     end
 
     def say(*as)
@@ -40,7 +40,7 @@ module Botaku
       @client.on(:close) { |d| invoke(:close, d) }
 
       @client.on('message') do |d|
-        (invoke_command(d) || invoke(:message, d)) if d['user'] != sself['id']
+        (invoke_command(d) || invoke(:message, d)) if d['user'] != _self['id']
       end
 
       @client.run

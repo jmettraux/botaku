@@ -9,7 +9,7 @@ class ZeroBot < Botaku::Bot
 
   def on_hello
 
-    p [ :on_hello, sself['id'] ]
+    p [ :on_hello, _self['id'] ]
 
     say(
       "I am #{name} (#{self.class}) from #{`uname -a`}...",

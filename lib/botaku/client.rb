@@ -30,7 +30,7 @@ module Botaku
       end
     end
 
-    def sself
+    def _self
 
       @rtm['self']
     end
