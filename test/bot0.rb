@@ -33,5 +33,7 @@ class ZeroBot < Botaku::Bot
   end
 end
 
-ZeroBot.new(token: File.read('test/.slack_api_token').strip).run
+#ZeroBot.new(token: File.read('test/.slack_api_token').strip).run
+  # or
+ZeroBot.new(token: 'test/.slack_api_token').run
 

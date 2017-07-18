@@ -4,7 +4,9 @@ require 'pp'
 $: << 'lib'
 require 'botaku'
 
-c = Botaku::Client.new(token: File.read('test/.slack_api_token').strip)
+#c = Botaku::Client.new(token: File.read('test/.slack_api_token').strip)
+  # or
+c = Botaku::Client.new(token: 'test/.slack_api_token')
 
 c.on('hello') do
   p [ :hello ]

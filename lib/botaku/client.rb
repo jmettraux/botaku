@@ -23,6 +23,11 @@ module Botaku
       @handlers = {}
 
       @http_client.debug_dev = $stderr if ENV['BOTAKU_DEBUG_HTTP']
+
+      if @opts[:token].match(/[\\\/.]/) || @opts[:token].count('-') != 2
+        @opts[:token_path] = @opts[:token]
+        @opts[:token] = File.read(@opts[:token]).strip
+      end
     end
 
     def sself

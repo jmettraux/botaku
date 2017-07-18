@@ -4,6 +4,7 @@
 
 ## botaku 0.9.0  not yet released
 
+- Read token as file if necessary
 - Implement Botaku::Client, based on HTTPClient and Faye-Websocket
 
 
