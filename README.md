@@ -58,6 +58,70 @@ ZeroBot.new(token: 'test/.slack_api_token').run
 (See [test/bot0.rb](test/bot0.rb))
 
 
+### Botaku::Bot#on_message
+
+Upon receiving a message in a channel it participates to, a bot will consider all its `on_message[...]` methods sorted in alphabetical order and call each of them, until one of them returns `true`.
+
+For example, this bot will invoke `#on_message` then `#on_message_b` and stop since `#on_message_b` returns `true`.
+
+```ruby
+require 'botaku'
+
+class OneBot < Botaku::Bot
+
+  def on_message(data)
+
+    say("0 @#{user_name(data)} said: #{data['text'].inspect}", data['channel'])
+  end
+
+  def on_message_b(data)
+
+    say("1 @#{user_name(data)} said: #{data['text'].inspect}", data['channel'])
+
+    true # stops calling the on_message_xxx chain
+  end
+
+  def on_message_c(data)
+
+    say("1 @#{user_name(data)} said: #{data['text'].inspect}", data['channel'])
+  end
+end
+
+OneBot.new(token: 'test/.slack_api_token').run
+```
+(See [test/bot1.rb](test/bot1.rb))
+
+Here is perhaps a better example:
+
+```ruby
+require 'botaku'
+
+class TwoBot < Botaku::Bot
+
+  def on_message_cheese(data)
+
+    if data['text'].match(/\bcheese\b/i)
+      say(
+        "We have some Gruyères or some Vacherin, would you like to order some?",
+        data['channel'])
+      true # stop looking at #on_message...
+    end
+  end
+
+  def on_message_wine(data)
+
+    if data['text'].match(/\b(wine|red)\b/i)
+      say("Sorry @#{user_name(data)}, we're out of wine", data['channel'])
+      true # stop looking at #on_message...
+    end
+  end
+end
+
+TwoBot.new(token: 'test/.slack_api_token').run
+```
+(See [test/bot2.rb](test/bot2.rb))
+
+
 ## license
 
 MIT, see [LICENSE.txt](LICENSE.txt).
