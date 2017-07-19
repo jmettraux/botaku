@@ -148,6 +148,8 @@ module Botaku
 
       @ws_client.send(JSON.dump(args) + "\n")
         # the \n seems to help flushing the buffer
+
+      false # make sure that #say and #typing do not return true
     end
 
     def next_id
