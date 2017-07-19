@@ -56,7 +56,7 @@ module Botaku
 
     def invoke_command(data)
 
-      public_methods.sort.grep(/\Aon_command_[a-z]+\z/)
+      methods.sort.grep(/\Aon_command_[a-z]+\z/)
         .each do |meth|
           m = match_command(data, meth.to_s[11..-1])
           next unless m
@@ -70,7 +70,7 @@ module Botaku
 
     def invoke(type, data=nil)
 
-      public_methods.sort.grep(/\Aon_#{type}/)
+      methods.sort.grep(/\Aon_#{type}/)
         .each do |meth|
           args = method(meth).arity == 1 ? [ data ] : []
           r = self.send(meth, *args)

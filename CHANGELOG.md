@@ -4,6 +4,8 @@
 
 ## botaku 1.0.0  not yet released
 
+- enumerate methods, not just public_methods when on_message or on_command
+
 
 ## botaku 0.9.0  released 2017-07-19
 
