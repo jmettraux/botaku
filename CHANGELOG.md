@@ -4,6 +4,7 @@
 
 ## botaku 1.0.0  not yet released
 
+- Introduce `data['sname']` and `data['cfname']`
 - Introduce `data['uname']` and `data['cname']`
 - Enumerate methods, not just public_methods when on_message or on_command
 

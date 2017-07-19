@@ -191,6 +191,7 @@ module Botaku
 
       data['uname'] = "@#{user_name(data)}"
       data['cname'] = "##{channel_name(data)}"
+      data['sname'] = "@#{user_name(_self['id'])}"
 
       (@handlers[data['type']] || []).each do |block|
         block.arity == 1 ? block.call(data) : block.call

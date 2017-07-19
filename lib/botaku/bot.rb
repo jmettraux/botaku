@@ -40,6 +40,9 @@ module Botaku
       @client.on(:close) { |d| invoke(:close, d) }
 
       @client.on('message') do |d|
+
+        d['cfname'] = @conf_name if @conf_name
+
         (invoke_command(d) || invoke(:message, d)) if d['user'] != _self['id']
       end
 
@@ -51,7 +54,7 @@ module Botaku
 
     def determine_conf_name
 
-      self.class.name.split(':').last.downcase[0..-4]
+      @conf_name = self.class.name.split(':').last.downcase[0..-4]
     end
 
     def invoke_command(data)
