@@ -16,19 +16,19 @@ class OneBot < Botaku::Bot
 
   def on_message(data)
 
-    say("0 @#{user_name(data)} said: #{data['text'].inspect}", data['channel'])
+    say("0 #{data['uname']} said: #{data['text'].inspect}", data['channel'])
   end
 
   def on_message_b(data)
 
-    say("1 @#{user_name(data)} said: #{data['text'].inspect}", data['channel'])
+    say("1 #{data['uname']} said: #{data['text'].inspect}", data['channel'])
 
     true # stops calling the on_message_xxx chain
   end
 
   def on_message_c(data)
 
-    say("1 @#{user_name(data)} said: #{data['text'].inspect}", data['channel'])
+    say("1 #{data['uname']} said: #{data['text'].inspect}", data['channel'])
   end
 end
 

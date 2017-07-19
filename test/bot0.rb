@@ -26,7 +26,7 @@ class ZeroBot < Botaku::Bot
   def on_message(data)
 
     typing(data['channel'])
-    say("@#{user_name(data)} said: #{data['text'].inspect}", data['channel'])
+    say("#{data['uname']} said: #{data['text'].inspect}", data['channel'])
     #p [ :on_message, user_name(data), data['text'] ]
   end
 end

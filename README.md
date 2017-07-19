@@ -47,7 +47,7 @@ class ZeroBot < Botaku::Bot
   def on_message(data)
 
     typing(data['channel'])
-    say("@#{user_name(data)} said: #{data['text'].inspect}", data['channel'])
+    say("#{data['uname']} said: #{data['text'].inspect}", data['channel'])
   end
 end
 
@@ -71,19 +71,19 @@ class OneBot < Botaku::Bot
 
   def on_message(data)
 
-    say("0 @#{user_name(data)} said: #{data['text'].inspect}", data['channel'])
+    say("0 #{data['uname']} said: #{data['text'].inspect}", data['channel'])
   end
 
   def on_message_b(data)
 
-    say("1 @#{user_name(data)} said: #{data['text'].inspect}", data['channel'])
+    say("1 #{data['uname']} said: #{data['text'].inspect}", data['channel'])
 
     true # stops calling the on_message_xxx chain
   end
 
   def on_message_c(data)
 
-    say("1 @#{user_name(data)} said: #{data['text'].inspect}", data['channel'])
+    say("1 #{data['uname']} said: #{data['text'].inspect}", data['channel'])
   end
 end
 
@@ -102,7 +102,8 @@ class TwoBot < Botaku::Bot
 
     if data['text'].match(/\bcheese\b/i)
       say(
-        "We have some Gruyères or some Vacherin, would you like to order some?",
+        "We have some Gruyères or some Vacherin Fribourgeois, " +
+        "would you like to order some?",
         data['channel'])
       true # stop looking at #on_message...
     end
@@ -111,7 +112,7 @@ class TwoBot < Botaku::Bot
   def on_message_wine(data)
 
     if data['text'].match(/\b(wine|red)\b/i)
-      say("Sorry @#{user_name(data)}, we're out of wine", data['channel'])
+      say("Sorry #{data['uname']}, we're out of wine", data['channel'])
       true # stop looking at #on_message...
     end
   end

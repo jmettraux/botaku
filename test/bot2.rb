@@ -26,7 +26,7 @@ class TwoBot < Botaku::Bot
   def on_message_wine(data)
 
     if data['text'].match(/\b(wine|red)\b/i)
-      say("Sorry @#{user_name(data)}, we're out of wine", data['channel'])
+      say("Sorry #{data['uname']}, we're out of wine", data['channel'])
       true # stop looking at #on_message...
     end
   end

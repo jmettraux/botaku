@@ -15,7 +15,7 @@ end
 c.on('message') do |data|
   p [ :message, data ]
   if data['text'] == 'ping'
-    c.say('pong', channel: data['channel'])
+    c.say("pong #{data['uname']}", channel: data['channel'])
   end
 end
 
