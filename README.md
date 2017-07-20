@@ -123,6 +123,40 @@ TwoBot.new(token: 'test/.slack_api_token').run
 (See [test/bot2.rb](test/bot2.rb))
 
 
+### Botaku::Bot#on_command_xxx
+
+Here is a bot that accepts 3 commands, `weather`, `args`, and `echo`:
+```ruby
+require 'botaku'
+
+class ThreeBot < Botaku::Bot
+
+  def on_command_weather(data)
+
+    say("it's fine today", data['channel'])
+  end
+
+  # The `data['match']` hash contains the array of
+  # arguments of the command
+
+  def on_command_args(data)
+
+    say(data['match'].inspect, data['channel'])
+  end
+
+  # The `data['line']` hash contains the rest of the string
+  # after the command
+
+  def on_command_echo(data)
+
+    say(data['line'], data['channel'])
+  end
+end
+
+ThreeBot.new(token: 'test/.slack_api_token').run
+```
+
+
 ## license
 
 MIT, see [LICENSE.txt](LICENSE.txt).
