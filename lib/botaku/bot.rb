@@ -64,6 +64,7 @@ module Botaku
           m = match_command(data, meth.to_s[11..-1])
           next unless m
           data['match'] = m
+          data['line'] = data['text'].lstrip.split(/\s+/, 2).last
           self.send(meth, data)
           return true
         end
