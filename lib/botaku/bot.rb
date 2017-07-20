@@ -59,7 +59,7 @@ module Botaku
 
     def invoke_command(data)
 
-      methods.sort.grep(/\Aon_command_[a-z]+\z/)
+      methods.sort.grep(/\Aon_command_[a-z0-9_]+\z/)
         .each do |meth|
           m = match_command(data, meth.to_s[11..-1])
           next unless m
